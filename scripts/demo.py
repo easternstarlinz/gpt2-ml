@@ -201,6 +201,7 @@ with tf.Session(config=tf_config, graph=tf.Graph()) as sess:
 
             l = re.findall('.{1,70}', gens[0].replace('[UNK]', '').replace('##', ''))
             print("\n".join(l))
+            f_harvest.write(text+'\n')
             f_harvest.write("\n".join(l))
         #print('Next try:⬇️')
         #text = input()
