@@ -157,6 +157,8 @@ batch_size_per_chunk = int(np.ceil(args.batch_size / num_chunks))
 top_p = np.ones((num_chunks, batch_size_per_chunk), dtype=np.float32) * args.top_p
 
 tf_config = tf.ConfigProto(allow_soft_placement=True)
+f_seed = open('seed.txt','r')
+f_harvest = open('harvest.txt','w')
 
 with tf.Session(config=tf_config, graph=tf.Graph()) as sess:
     initial_context = tf.placeholder(tf.int32, [batch_size_per_chunk, None])
@@ -170,8 +172,10 @@ with tf.Session(config=tf_config, graph=tf.Graph()) as sess:
     saver = tf.train.Saver()
     saver.restore(sess, args.ckpt_fn)
     print('🍺Model loaded. \nInput something please:⬇️')
-    text = input()
+    #text = input()
+    text = f_seed.readline()
     while text != "":
+        print("input =%s \n" % text)
         for i in range(args.samples):
             print("Sample,", i + 1, " of ", args.samples)
             line = tokenization.convert_to_unicode(text)
@@ -197,5 +201,9 @@ with tf.Session(config=tf_config, graph=tf.Graph()) as sess:
 
             l = re.findall('.{1,70}', gens[0].replace('[UNK]', '').replace('##', ''))
             print("\n".join(l))
-        print('Next try:⬇️')
-        text = input()
+            f_harvest.write("\n".join(l))
+        #print('Next try:⬇️')
+        #text = input()
+        text = f_seed.readline()
+    f_seed.close()
+    f_harvest.close()
